@@ -1,87 +1,90 @@
 var canvas;
-var canvasWidth;
 var ctx;
-var seizePoint;
 var cellSize;
+var game;
 
+canvas = document.getElementById('canvas-game');
+ctx = canvas.getContext("2d");
+
+// on resize or screen orientation change
+window.addEventListener('resize', resizeCanvas, false);
+window.addEventListener('orientationchange', resizeCanvas, false);
+
+
+
+// draw a first canvas
 function init() {
-  canvas = document.getElementById('canvas-game');
-  if (canvas.getContext) {
-    ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = canvas.width/4;
 
-    window.addEventListener('resize', resizeCanvas, false);
-    window.addEventListener('orientationchange', resizeCanvas, false);
-    resizeCanvas();
+  var seizePoint = canvas.height/3;
 
-    //define and start a game
-    var game = new Game(cellSize);
-
-  }
+  // height and width of an image cell
+  cellSize = seizePoint/20;
 }
+init();
 
+
+// define a character
+var hero = new Character(cellSize);
+
+
+// resize a canvas
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = canvas.width/4;
 
-  seizePoint = canvas.height/3;
+  var seizePoint = canvas.height/3;
 
   // height and width of an image cell
-  var cellSize = seizePoint/20;
+  cellSize = seizePoint/20;
 
-  //define a game
-  var game = new Game(cellSize);
-  //start a game
-  setInterval(game.run.bind(game), 20);
+  // resize character images and fit positions
+  hero.fitSize(cellSize);
+}
+resizeCanvas();
+
+
+// loop function
+function run() {
+	update((Date.now() - time) / 1000);
+	drawScene();
+	time = Date.now();
+}
+
+function update(mod) {
 
 }
 
+// counter to change run images
+var runCounter = 0;
 
-/// GAME ///
+function drawScene() {
 
-function Game(cellSize) {
-
-  this.cellSize = cellSize;
-  //define a character
-  this.hero = new Character(cellSize);
-  this.time = Date.now();
-
-  this.run = function() {
-
-  	this.update((Date.now() - this.time) / 1000);
-  	this.drawScene();
-  	this.time = Date.now();
-  };
-
-  this.update = function(mod) {
-      this.hero.posY -= this.hero.speed * mod;
-  };
-
-  this.drawScene = function() {
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(this.hero.image_1, 0, this.hero.posY);
-    ctx.drawImage(this.hero.image_2, this.cellSize*20, this.hero.posY);
-    ctx.drawImage(this.hero.image_3, this.cellSize*20*2, this.hero.posY);
-  };
-
-  this.start = function() {
-
-    //bind(this) refer an object
-    //setInterval(this.run.bind(this), 0);
-  };
+  runCounter += 1;
+  if (runCounter > 10) {
+    hero.runPosition = hero.runPosition == 0 ? 1 : 0;
+    runCounter = 0;
+  }
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (hero.runPosition == 0) {
+    ctx.drawImage(hero.image_1, hero.posX, hero.posY);
+  } else {
+    ctx.drawImage(hero.image_2, hero.posX, hero.posY);
+  }
 }
 
 
-/// CHARACTER ///
+/// CHARACTER CLASS (Constructor) ///
 
 function Character(cellSize) {
 
   this.cellSize = cellSize;
 
-  this.posX = 0;
-  this.posY = canvas.height/1.5;
+  this.posX = this.cellSize*10;
+  this.posY = this.cellSize*40;
   this.speed = 100;
-  this.isJumping = false;
+  this.runPosition = 0;
 
   this.image_1;
   this.image_2;
@@ -89,8 +92,8 @@ function Character(cellSize) {
 
   this.px =  [
           [ [' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','#','#','#',' ',' ',' ',' ',' '],
-            [' ',' ','#','#','#','#','#',' ',' ',' ',' ',' ',' ','#',' ',' ',' ',' ',' '],
-            [' ',' ',' ',' ',' ',' ','#','#','#','#','#','#','#','#','#',' ',' ',' ',' '],
+            [' ',' ',' ',' ','#','#','#',' ',' ',' ',' ',' ',' ','#',' ',' ',' ',' ',' '],
+            [' ',' ','#','#',' ',' ','#','#','#','#','#','#','#','#','#',' ',' ',' ',' '],
             [' ',' ',' ',' ',' ','#','#','#',' ',' ',' ',' ',' ',' ','#','#','#',' ',' '],
             [' ',' ',' ',' ','#','#',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','#',' ',' '],
             ['#','#','#','#','#',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','#','#',' '],
@@ -101,8 +104,8 @@ function Character(cellSize) {
             [' ','#',' ',' ',' ',' ',' ',' ','#','#','#','#','#','#','#',' ',' ',' ','#'],
             [' ','#',' ',' ',' ',' ',' ','#','#','#','#','#','#','#','#','#',' ',' ','#'],
             [' ','#','#',' ',' ',' ',' ','#','#','#','#','#','#','#','#','#',' ',' ','#'],
-            [' ',' ','#',' ',' ',' ',' ','#','#','#','#','#','#','#','#','#',' ','#',' '],
-            [' ',' ','#','#',' ',' ',' ','#',' ','#',' ','#',' ','#',' ',' ',' ','#',' '],
+            [' ',' ','#',' ',' ',' ',' ',' ','#','#','#','#','#','#','#','#',' ','#',' '],
+            [' ',' ','#','#',' ',' ',' ',' ',' ','#',' ','#',' ','#',' ',' ',' ','#',' '],
             [' ',' ',' ','#',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','#',' ',' '],
             [' ',' ',' ','#','#','#','#',' ',' ',' ',' ',' ',' ','#','#','#',' ',' ',' '],
             [' ',' ',' ',' ',' ','#','#','#','#','#','#','#','#','#',' ','#',' ',' ',' '],
@@ -117,12 +120,12 @@ function Character(cellSize) {
               ['#','#','#','#','#',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','#','#',' '],
               ['#',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','#',' ','#',' ',' ',' ','#',' '],
               ['#',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','#',' ','#',' ',' ',' ','#',' '],
-              ['#',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','#','#'],
-              ['#','#',' ',' ',' ',' ',' ',' ',' ','#',' ','#',' ','#',' ',' ',' ',' ','#'],
-              [' ','#',' ',' ',' ',' ',' ',' ','#','#','#','#','#','#','#',' ',' ',' ','#'],
-              [' ','#',' ',' ',' ',' ',' ','#','#','#','#','#','#','#','#','#',' ',' ','#'],
-              [' ','#','#',' ',' ',' ','#','#','#','#','#','#','#','#','#','#',' ',' ','#'],
-              [' ',' ','#',' ',' ',' ','#','#','#','#','#','#','#','#','#','#',' ','#',' '],
+              ['#',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','#',' '],
+              ['#','#',' ',' ',' ',' ',' ',' ',' ','#',' ','#',' ','#',' ',' ',' ','#',' '],
+              [' ','#',' ',' ',' ',' ',' ',' ','#','#','#','#','#','#','#',' ',' ','#',' '],
+              [' ','#',' ',' ',' ',' ',' ','#','#','#','#','#','#','#','#',' ',' ','#',' '],
+              [' ','#','#',' ',' ',' ','#','#','#','#','#','#','#','#','#',' ',' ','#',' '],
+              [' ',' ','#',' ',' ',' ','#','#','#','#','#','#','#','#','#',' ',' ','#',' '],
               [' ',' ','#','#',' ',' ',' ','#',' ','#',' ','#',' ','#',' ',' ',' ','#',' '],
               [' ',' ',' ','#',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','#',' ',' '],
               [' ',' ',' ','#','#','#','#',' ',' ',' ',' ',' ',' ','#','#','#',' ',' ',' '],
@@ -152,6 +155,13 @@ function Character(cellSize) {
                 [' ',' ',' ',' ',' ',' ',' ','#',' ',' ',' ',' ',' ','#',' ',' ',' ',' ',' '] ]
           ];
 
+  this.fitSize = function(cellSize) {
+    this.cellSize = cellSize;
+    this.posX = this.cellSize*10;
+    this.posY = this.cellSize*40;
+    this.drawImages();
+  };
+
   this.drawFromArray = function(array, canvasCtx) {
     //start coordinates on the canvas, left-top corner
     var coord_x = 0;
@@ -175,30 +185,27 @@ function Character(cellSize) {
   };
 
   this.createImage = function(imageNr) {
-      // create a character canvas
-      var character = document.createElement('canvas');
+    // create a character canvas
+    var character = document.createElement('canvas');
 
-      // 20 cells width and height
-      character.width = this.cellSize*20;
-      character.height = this.cellSize*20;
-      var characterCtx = character.getContext('2d');
+    // 20 cells width and height
+    character.width = this.cellSize*20;
+    character.height = this.cellSize*20;
+    var characterCtx = character.getContext('2d');
 
-      // draw a character image
-      this.drawFromArray(this.px[imageNr], characterCtx);
-      return character;
+    // draw a character image
+    this.drawFromArray(this.px[imageNr], characterCtx);
+    return character;
   };
 
-  //draw character images
-  this.image_1 = this.createImage(0);
-  this.image_2 = this.createImage(1);
-  this.image_3 = this.createImage(2);
-
-  this.jump = function() {
-    this.isJumping = true;
+  this.drawImages = function() {
+    //draw character images
+    this.image_1 = this.createImage(0);
+    this.image_2 = this.createImage(1);
+    this.image_3 = this.createImage(2);
   };
 
 }
 
-
-
-init();
+var time = Date.now();
+setInterval(run, 20);
