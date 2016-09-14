@@ -30,10 +30,14 @@ var hero = new Character(cellSize);
 
 
 window.onclick = function() {
-  hero.jump();
+  if (hero.landing == false) {
+    hero.jump();
+  }
 };
 window.touchstart = function() {
-  hero.jump();
+  if (hero.landing == false) {
+    hero.jump();
+  }
 };
 
 
