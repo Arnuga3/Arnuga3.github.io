@@ -5,6 +5,7 @@ var game;
 
 
 
+/// PIXEL ART ///
 ////////////////////////////////////////////////////////////////////////////////
 
 pixCharacter =  [
@@ -73,11 +74,10 @@ pixCharacter =  [
 ];
 
 
+
+/// CLASSES ///
 ////////////////////////////////////////////////////////////////////////////////
-
-
-
-/// OBJECT CLASS (Constructor) ///
+/// BLOCK CLASS (Constructor) ///
 
 function Block(cellsize, x, y, speed, pix) {
   this.cellSize = cellSize;
@@ -166,7 +166,6 @@ Block.prototype.fitSize = function(cellSize) {
 };
 
 
-
 /// CHARACTER CLASS (Constructor) ///
 
 function Character(cellSize, x, y, speed, pix) {
@@ -177,20 +176,18 @@ function Character(cellSize, x, y, speed, pix) {
   this.runPosition = 0;
   this.jumpHeight = 30;
   this.jumpHeightCounter = this.jumpHeight;
-
   this.jumping = false;
   this.landing = false;
-
-  this.jump = function() {
-    this.jumping = true;
-  };
-
 }
 
+// inherit form a Block
 Character.prototype = new Block();
+// use its own constructor
 Character.prototype.constructor = Character;
-
-
+// add a method
+Character.prototype.jump = function() {
+  this.jumping = true;
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 
