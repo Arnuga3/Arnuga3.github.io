@@ -1,10 +1,3 @@
-var canvas;
-var ctx;
-var cellSize;
-var game;
-
-
-
 /// PIXEL ART ///
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -157,6 +150,10 @@ Block.prototype.drawImages = function() {
   }
 }
 
+Block.prototype.getImage = function(num) {
+  return this.images[num];
+}
+
 Block.prototype.fitSize = function(cellSize) {
   this.cellSize = cellSize;
   this.setX(heroX * cellSize);
@@ -189,9 +186,13 @@ Character.prototype.jump = function() {
   this.jumping = true;
 };
 
+
+/// GAME LOGIC ///
 ////////////////////////////////////////////////////////////////////////////////
-
-
+var canvas;
+var ctx;
+var cellSize;
+var game;
 
 canvas = document.getElementById('canvas-game');
 ctx = canvas.getContext("2d");
@@ -216,6 +217,7 @@ init();
 
 
 // define a character
+// reset values (no effect from a canvas size)
 var heroX  = 10;
 var heroY = 40;
 var heroSpeed = 60;
@@ -265,7 +267,7 @@ function update(mod) {
 
   if (!hero.jumping) {
 
-    // if on ground - running
+    // if on ground, running
     if (hero.landing == false) {
       runCounter += 1;
       if (runCounter > 7) {
@@ -274,6 +276,7 @@ function update(mod) {
       }
     }
 
+    // gravity, if statement do not let to fall under the ground
     // same as hero.posY += hero.speed * mod
     hero.setY(hero.getY() + hero.getSpeed() * mod);
     if (hero.getY() + cellSize * 20 >= canvas.height) {
@@ -289,7 +292,7 @@ function update(mod) {
     // draw a jumping image
     hero.runPosition = 2;
 
-    // move up
+    // move up, jumping
     hero.setY(hero.getY() - hero.getSpeed() * mod);
 		hero.jumpHeightCounter -= 1;
 
@@ -297,21 +300,19 @@ function update(mod) {
     if (hero.jumpHeightCounter <= 0) {
       hero.jumping = false;
       hero.jumpHeightCounter = hero.jumpHeight;
-
     }
   }
-
 }
 
 function drawScene() {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   if (hero.runPosition == 0) {
-    ctx.drawImage(hero.images[0], hero.getX(), hero.getY());
+    ctx.drawImage(hero.getImage(0), hero.getX(), hero.getY());
   } else if(hero.runPosition == 1) {
-    ctx.drawImage(hero.images[1], hero.getX(), hero.getY());
+    ctx.drawImage(hero.getImage(1), hero.getX(), hero.getY());
   } else if(hero.runPosition == 2) {
-    ctx.drawImage(hero.images[2], hero.getX(), hero.getY());
+    ctx.drawImage(hero.getImage(2), hero.getX(), hero.getY());
   }
 }
 
