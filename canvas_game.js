@@ -224,7 +224,7 @@ Block.prototype.getImage = function(num) {
 
 Block.prototype.fitSize = function(cellSize, reset) {
   this.cellSize = cellSize;
-  this.setX(reset.x * cellSize);
+  this.setX(reset.x);
   this.setY(reset.y * cellSize);
   this.setSpeed(reset.speed * cellSize);
   this.drawImages();
@@ -302,7 +302,7 @@ init();
 // define a character
 // reset values (no effect from a canvas size)
 var heroReset = {
-  x: 10,
+  x: canvas.width/12,
   y: 40,
   speed: 60
 };
@@ -310,7 +310,7 @@ var hero = new Character(cellSize, heroReset.x, heroReset.y, heroReset.speed, pi
 
 // reset values (no effect from a canvas size)
 var barrierReset = {
-  x: canvas.width + 100,
+  x: 0,
   y: 40,
   speed: 60
 };
@@ -338,6 +338,10 @@ function resizeCanvas() {
 
   // height and width of an image cell
   cellSize = seizePoint/20;
+
+  // reset x position on canas width change
+  barrierReset.x = canvas.width;
+  heroReset.x = canvas.width/12;
 
   // resize character images and fit positions
   hero.fitSize(cellSize, heroReset);
